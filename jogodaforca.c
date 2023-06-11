@@ -2,15 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 
+#define LIMIT 20
+
 void text_upper(char *text, char *text_upper)
 {
     int i;
     strcpy(text_upper, text);
     for(i = 0; text_upper[i] != '\0'; i++)
     {
-        if(text_upper[i] >= 97 && text_upper[i] <= 122) // se for minúsculo no ascii
+        if(text_upper[i] >= 97 && text_upper[i] <= 122) // se for minÃºsculo no ascii
         {
-            text_upper[i] -= 32; // vai receber ascii maiúsculo
+            text_upper[i] -= 32; // vai receber ascii maiÃºsculo
         }
     }
 }
@@ -58,7 +60,7 @@ void draw_man(int **lives_draw)
     }
 }
 
-void guess_letter(char *secret, char *secret_cpy, int *lives, int word_sz, char *secret_upper)
+void guess_letter(char *secret, char *secret_cpy, int *lives, int wrd_size, char *secret_upper)
 {
     int i;
     char guess_letter;
@@ -72,7 +74,7 @@ void guess_letter(char *secret, char *secret_cpy, int *lives, int word_sz, char 
     {
         hit = 0;
         system("cls");
-        printf("Palavra secreta(possui %d letras): %s          Vidas: %d", word_sz, secret_cpy, *lives);
+        printf("Palavra secreta(possui %d letras): %s          Vidas: %d", wrd_size, secret_cpy, *lives);
         printf("          Letras erradas: ");
 
         for(i = 0; i <= error_count; i++)
@@ -90,7 +92,7 @@ void guess_letter(char *secret, char *secret_cpy, int *lives, int word_sz, char 
             guess_letter_upper -= 32;
         }
 
-        for(i = 0; i < word_sz; i++)
+        for(i = 0; i < wrd_size; i++)
         {
             if(secret_upper[i] == guess_letter_upper)
             {
@@ -112,7 +114,7 @@ void guess_letter(char *secret, char *secret_cpy, int *lives, int word_sz, char 
         {
             *lives = *lives - 1;
             error_letters[error_count] = guess_letter;
-            printf("Palavra secreta(possui %d letras): %s          Vidas: %d", word_sz, secret_cpy, *lives);
+            printf("Palavra secreta(possui %d letras): %s          Vidas: %d", wrd_size, secret_cpy, *lives);
             printf("          Letras erradas: ");
 
             for(i = 0; i <= error_count; i++)
@@ -152,16 +154,16 @@ void guess_letter(char *secret, char *secret_cpy, int *lives, int word_sz, char 
     } while (*lives > 0);
 }
 
-void guess_word(char *secret, char *secret_cpy, int *lives, char *secret_upper)
+void guess_word(char *secret, char *secret_cpy, int *lives, int wrd_size, char *secret_upper)
 {
-    char secret_cpy_upper[20];
+    char secret_cpy_upper[LIMIT];
     system("cls");
-    printf("Palavra secreta(possui %d letras): %s\n\n", strlen(secret_cpy), secret_cpy);
+    printf("Palavra secreta(possui %d letras): %s\n\n", wrd_size, secret_cpy);
     printf("Tente adivinhar a palavra, se errar perde todas as vidas: ");
     scanf("%19s", secret_cpy);
     text_upper(secret_cpy, secret_cpy_upper);
 
-    if(!strcmp(secret_cpy_upper, secret_upper)) // comparar a entrada maiúscula com palavra secreta maiúscula
+    if(!strcmp(secret_cpy_upper, secret_upper)) // comparar a entrada maiÃºscula com palavra secreta maiÃºscula
     {
         printf("\nParabens voce ganhou\n\nPalavra secreta: %s\n\n", secret);
         system("pause");
@@ -178,14 +180,14 @@ int main()
 {
     int i;
     int word_size;
-    char secret_word[20];
-    char secret_word_cpy[20];
-    char secret_word_upper[20];
+    char secret_word[LIMIT];
+    char secret_word_cpy[LIMIT];
+    char secret_word_upper[LIMIT];
     int lives = 7;
     char menu;
 
     printf("Digite a palavra secreta: ");
-    scanf("%19s", secret_word); //19 pois têm que sobrar 1 para: delimitador de string '\0'
+    scanf("%19s", secret_word); //19 pois tÃªm que sobrar 1 para: delimitador de string '\0'
     text_upper(secret_word, secret_word_upper);
     strcpy(secret_word_cpy, secret_word);
     word_size = strlen(secret_word_cpy);
@@ -207,11 +209,11 @@ int main()
                 guess_letter(secret_word, secret_word_cpy, &lives, word_size, secret_word_upper);
                 if(lives > 0)
                 {
-                    guess_word(secret_word, secret_word_cpy, &lives, secret_word_upper);
+                    guess_word(secret_word, secret_word_cpy, &lives, word_size, secret_word_upper);
                 }
                 break;
             case '2':
-                guess_word(secret_word, secret_word_cpy, &lives, secret_word_upper);
+                guess_word(secret_word, secret_word_cpy, &lives, word_size, secret_word_upper);
                 break;
             default:
                 printf("\nEssa opcao nao existe\n\n");
