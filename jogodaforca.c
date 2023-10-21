@@ -1,25 +1,13 @@
-#include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
+#include <stdbool.h>
 
 #define LIMIT 20
 
-void text_upper(char *text, char *text_upper)
+void draw_man(int **lives)
 {
-    int i;
-    strcpy(text_upper, text);
-    for(i = 0; text_upper[i] != '\0'; i++)
-    {
-        if(text_upper[i] >= 97 && text_upper[i] <= 122) // se for minúsculo no ascii
-        {
-            text_upper[i] -= 32; // vai receber ascii maiúsculo
-        }
-    }
-}
-
-void draw_man(int **lives_draw)
-{
-    switch(**lives_draw)
+    switch(**lives)
     {
         case 7:
             break;
@@ -60,169 +48,74 @@ void draw_man(int **lives_draw)
     }
 }
 
-void guess_letter(char *secret, char *secret_cpy, int *lives, int wrd_size, char *secret_upper)
-{
-    int i;
+void guess(char *secret_word, char *secret_word_hidden, int *lives) {
     char guess_letter;
-    char guess_letter_upper;
-    char sub_menu;
-    int hit;
-    int error_count = 0;
-    char error_letters[7] = {'\0'};
+    boolean hit;
 
-    do
-    {
-        hit = 0;
+    while (*lives > 0) {
+        hit = false;
         system("cls");
-        printf("Palavra secreta(possui %d letras): %s          Vidas: %d", wrd_size, secret_cpy, *lives);
-        printf("          Letras erradas: ");
-
-        for(i = 0; i <= error_count; i++)
-        {
-            printf("%c ", error_letters[i]);
-        }
-
-        printf("\n\n");
+        printf("Palavra secreta: %s\nVidas: %d\n", secret_word_hidden, *lives);
         draw_man(&lives);
-        printf("\n\nTente adivinhar alguma letra na palavra: ");
-        scanf(" %1c", &guess_letter);
-        guess_letter_upper = guess_letter;
-        if(guess_letter_upper >= 97 && guess_letter_upper <= 122)
-        {
-            guess_letter_upper -= 32;
+        printf("\n\nAdivinhe uma letra: ");
+        guess_letter = getchar();
+        while (getchar() != '\n'); //limpar o buffer de entrada até encontrar '\n' gerado pelo getchar()
+        guess_letter = toupper(guess_letter);
+
+        for (int i = 0; secret_word[i] != '\0'; i++) {
+            if (guess_letter == toupper(secret_word[i])) {
+                hit = true;
+                secret_word_hidden[i] = secret_word[i];
+            }
         }
 
-        for(i = 0; i < wrd_size; i++)
-        {
-            if(secret_upper[i] == guess_letter_upper)
-            {
-                secret_cpy[i] = secret[i];
-                hit++;
-            }
+        if (!hit) {
+            *lives -= 1;
         }
 
         system("cls");
-
-        if(!strcmp(secret_cpy, secret)) // retorna 0 se forem iguais por isso "!"
-        {
-            printf("\nParabens voce ganhou\n\nPalavra secreta: %s\n\n", secret);
-            system("pause");
-            exit(1);
-        }
-
-        if(hit == 0)
-        {
-            *lives = *lives - 1;
-            error_letters[error_count] = guess_letter;
-            printf("Palavra secreta(possui %d letras): %s          Vidas: %d", wrd_size, secret_cpy, *lives);
-            printf("          Letras erradas: ");
-
-            for(i = 0; i <= error_count; i++)
-            {
-                printf("%c ", error_letters[i]);
-            }
-
-            error_count++;
-            printf("\n\n");
-            draw_man(&lives);
-            printf("\nVoce errou, Letra: '%c' nao encontrada\n\n", guess_letter);
-        }
-        else
-        {
-            printf("Palavra secreta(possui %d letras): %s          Vidas: %d", strlen(secret_cpy), secret_cpy, *lives);
-            printf("          Letras erradas: ");
-
-            for(i = 0; i <= error_count; i++)
-            {
-                printf("%c ", error_letters[i]);
-            }
-
-            printf("\n\n");
-            draw_man(&lives);
-            printf("\nLetra: '%c' encontrada\n\n", guess_letter);
-        }
-
-        if (*lives > 0)
-        {
-            printf("Deseja continuar adivinhando as letras? Escolha a opcao (nao) caso saiba a palavra\n(1) - Sim\n(2) - Nao\n:");
-            scanf(" %1c", &sub_menu);
-            if(sub_menu == '2')
-            {
-                break;
-            }
-        }
-    } while (*lives > 0);
-}
-
-void guess_word(char *secret, char *secret_cpy, int *lives, int wrd_size, char *secret_upper)
-{
-    char secret_cpy_upper[LIMIT];
-    system("cls");
-    printf("Palavra secreta(possui %d letras): %s\n\n", wrd_size, secret_cpy);
-    printf("Tente adivinhar a palavra, se errar perde todas as vidas: ");
-    scanf("%19s", secret_cpy);
-    text_upper(secret_cpy, secret_cpy_upper);
-
-    if(!strcmp(secret_cpy_upper, secret_upper)) // comparar a entrada maiúscula com palavra secreta maiúscula
-    {
-        printf("\nParabens voce ganhou\n\nPalavra secreta: %s\n\n", secret);
-        system("pause");
-        exit(1);
-    }
-    else
-    {
-        *lives = 0;
+        printf("Palavra secreta: %s\nVidas: %d\n", secret_word_hidden, *lives);
         draw_man(&lives);
+
+        if (!strcmp(secret_word, secret_word_hidden)) {
+            printf("\n\nParabens voce venceu!, a palavra secreta era: %s\n", secret_word);
+            break;
+        }
+
+        if (*lives <= 0) {
+            printf("\n\nVoce perdeu todas as vidas, a palavra secreta era: %s\n", secret_word);
+        }
     }
 }
 
-int main()
-{
-    int i;
-    int word_size;
-    char secret_word[LIMIT];
-    char secret_word_cpy[LIMIT];
-    char secret_word_upper[LIMIT];
+int main() {
     int lives = 7;
-    char menu;
+    int secret_word_size;
+    char secret_word[LIMIT];
+    char secret_word_hidden[LIMIT];
+    char try_again = 's';
 
-    printf("Digite a palavra secreta: ");
-    scanf("%19s", secret_word); //19 pois têm que sobrar 1 para: delimitador de string '\0'
-    text_upper(secret_word, secret_word_upper);
-    strcpy(secret_word_cpy, secret_word);
-    word_size = strlen(secret_word_cpy);
+    while (try_again == 's' || try_again == 'S') {
+        lives = 7;
+        printf("Digite a palavra para ser adivinhada: ");
+        fgets(secret_word, LIMIT, stdin); //fgets lê espaços e \n, se chegar no LIMIT coloca um '\0' no lugar do \n
+        secret_word[strlen(secret_word) - 1] = '\0'; //tirar o \n e colocar '\0' na última pos
+        secret_word_size = strlen(secret_word);
+        strncpy(secret_word_hidden, secret_word, secret_word_size + 1); //secret_word_size + 1 por causa do '\0'
 
-    for(i = 0; i < word_size; i++)
-    {
-        secret_word_cpy[i] = '*';
-    }
-
-    do
-    {
-        system("cls");
-        printf("//// ESCOLHA UMA DAS OPCOES ABAIXO //// \n\n");
-        printf("1 - Adivinhar letras na palavra\n2 - Adivinhar a palavra(UMA CHANCE)\n\n: ");
-        scanf(" %1c", &menu);
-        switch(menu)
-        {
-            case '1':
-                guess_letter(secret_word, secret_word_cpy, &lives, word_size, secret_word_upper);
-                if(lives > 0)
-                {
-                    guess_word(secret_word, secret_word_cpy, &lives, word_size, secret_word_upper);
-                }
-                break;
-            case '2':
-                guess_word(secret_word, secret_word_cpy, &lives, word_size, secret_word_upper);
-                break;
-            default:
-                printf("\nEssa opcao nao existe\n\n");
-                system("pause");
+        for (int i = 0; secret_word_hidden[i] != '\0'; i++) {
+            if (secret_word_hidden[i] != ' ') {
+                secret_word_hidden[i] = '?';
+            }
         }
-    } while (lives > 0);
 
-    printf("\nVoce perdeu todas as vidas, a palavra correta era: %s\n\n", secret_word);
-    system("pause");
+        guess(secret_word, secret_word_hidden, &lives);
+
+        printf("\n\nDeseja jogar novamente? sim(s) ou nao(n): ");
+        try_again = getchar();
+        while (getchar() != '\n');
+        system("cls");
+    }
 
     return 0;
 }
