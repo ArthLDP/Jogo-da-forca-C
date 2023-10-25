@@ -48,11 +48,13 @@ void draw_man(int **lives)
     }
 }
 
-void guess(char *secret_word, char *secret_word_hidden, int *lives) {
+void guess(char *secret_word, char *secret_word_hidden, int *lives)
+{
     char guess_letter;
     boolean hit;
 
-    while (*lives > 0) {
+    while (*lives > 0) 
+    {
         hit = false;
         system("cls");
         printf("Palavra secreta: %s\nVidas: %d\n", secret_word_hidden, *lives);
@@ -62,14 +64,17 @@ void guess(char *secret_word, char *secret_word_hidden, int *lives) {
         while (getchar() != '\n'); //limpar o buffer de entrada até encontrar '\n' gerado pelo getchar()
         guess_letter = toupper(guess_letter);
 
-        for (int i = 0; secret_word[i] != '\0'; i++) {
-            if (guess_letter == toupper(secret_word[i])) {
+        for (int i = 0; secret_word[i] != '\0'; i++) 
+        {
+            if (guess_letter == toupper(secret_word[i])) 
+            {
                 hit = true;
                 secret_word_hidden[i] = secret_word[i];
             }
         }
 
-        if (!hit) {
+        if (!hit) 
+        {
             *lives -= 1;
         }
 
@@ -77,25 +82,29 @@ void guess(char *secret_word, char *secret_word_hidden, int *lives) {
         printf("Palavra secreta: %s\nVidas: %d\n", secret_word_hidden, *lives);
         draw_man(&lives);
 
-        if (!strcmp(secret_word, secret_word_hidden)) {
+        if (!strcmp(secret_word, secret_word_hidden)) 
+        {
             printf("\n\nParabens voce venceu!, a palavra secreta era: %s\n", secret_word);
             break;
         }
 
-        if (*lives <= 0) {
+        if (*lives <= 0) 
+        {
             printf("\n\nVoce perdeu todas as vidas, a palavra secreta era: %s\n", secret_word);
         }
     }
 }
 
-int main() {
+int main() 
+{
     int lives = 7;
     int secret_word_size;
     char secret_word[LIMIT];
     char secret_word_hidden[LIMIT];
     char try_again = 's';
 
-    while (try_again == 's' || try_again == 'S') {
+    while (try_again == 's' || try_again == 'S') 
+    {
         lives = 7;
         printf("Digite a palavra para ser adivinhada: ");
         fgets(secret_word, LIMIT, stdin); //fgets lê espaços e \n, se chegar no LIMIT coloca um '\0' no lugar do \n
@@ -103,8 +112,10 @@ int main() {
         secret_word_size = strlen(secret_word);
         strncpy(secret_word_hidden, secret_word, secret_word_size + 1); //secret_word_size + 1 por causa do '\0'
 
-        for (int i = 0; secret_word_hidden[i] != '\0'; i++) {
-            if (secret_word_hidden[i] != ' ') {
+        for (int i = 0; secret_word_hidden[i] != '\0'; i++) 
+        {
+            if (secret_word_hidden[i] != ' ') 
+            {
                 secret_word_hidden[i] = '?';
             }
         }
